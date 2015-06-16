@@ -275,4 +275,8 @@ public class GPUImageFilter {
         java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
     }
+
+    public void setSecondTextureInput(int textureId) {
+        // nop
+    }
 }

@@ -22,6 +22,7 @@ import android.content.DialogInterface;
 import android.graphics.BitmapFactory;
 import android.graphics.PointF;
 import jp.co.cyberagent.android.gpuimage.*;
+import jp.co.cyberagent.android.gpuimage.sample.filter.SelectiveGausianFilter;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +31,7 @@ public class GPUImageFilterTools {
     public static void showDialog(final Context context,
             final OnGpuImageFilterChosenListener listener) {
         final FilterList filters = new FilterList();
+        filters.addFilter("Selective Gausian Blur", FilterType.SELECTIVE_GAUSSIAN);
         filters.addFilter("Contrast", FilterType.CONTRAST);
         filters.addFilter("Invert", FilterType.INVERT);
         filters.addFilter("Pixelation", FilterType.PIXELATION);
@@ -121,6 +123,8 @@ public class GPUImageFilterTools {
 
     private static GPUImageFilter createFilterForType(final Context context, final FilterType type) {
         switch (type) {
+            case SELECTIVE_GAUSSIAN:
+                return new SelectiveGausianFilter();
             case CONTRAST:
                 return new GPUImageContrastFilter(2.0f);
             case GAMMA:
@@ -309,7 +313,7 @@ public class GPUImageFilterTools {
     }
 
     private enum FilterType {
-        CONTRAST, GRAYSCALE, SHARPEN, SEPIA, SOBEL_EDGE_DETECTION, THREE_X_THREE_CONVOLUTION, FILTER_GROUP, EMBOSS, POSTERIZE, GAMMA, BRIGHTNESS, INVERT, HUE, PIXELATION,
+        SELECTIVE_GAUSSIAN, CONTRAST, GRAYSCALE, SHARPEN, SEPIA, SOBEL_EDGE_DETECTION, THREE_X_THREE_CONVOLUTION, FILTER_GROUP, EMBOSS, POSTERIZE, GAMMA, BRIGHTNESS, INVERT, HUE, PIXELATION,
         SATURATION, EXPOSURE, HIGHLIGHT_SHADOW, MONOCHROME, OPACITY, RGB, WHITE_BALANCE, VIGNETTE, TONE_CURVE, BLEND_COLOR_BURN, BLEND_COLOR_DODGE, BLEND_DARKEN, BLEND_DIFFERENCE,
         BLEND_DISSOLVE, BLEND_EXCLUSION, BLEND_SOURCE_OVER, BLEND_HARD_LIGHT, BLEND_LIGHTEN, BLEND_ADD, BLEND_DIVIDE, BLEND_MULTIPLY, BLEND_OVERLAY, BLEND_SCREEN, BLEND_ALPHA,
         BLEND_COLOR, BLEND_HUE, BLEND_SATURATION, BLEND_LUMINOSITY, BLEND_LINEAR_BURN, BLEND_SOFT_LIGHT, BLEND_SUBTRACT, BLEND_CHROMA_KEY, BLEND_NORMAL, LOOKUP_AMATORKA,
@@ -389,6 +393,8 @@ public class GPUImageFilterTools {
                 adjuster = new ColorBalanceAdjuster().filter(filter);
             } else if (filter instanceof GPUImageLevelsFilter) {
                 adjuster = new LevelsMinMidAdjuster().filter(filter);
+            } else if (filter instanceof SelectiveGausianFilter) {
+                adjuster = new SelectiveGaussianBlurAdjuster().filter(filter);
             } else {
                 adjuster = null;
             }
@@ -575,6 +581,13 @@ public class GPUImageFilterTools {
         }
 
         private class GaussianBlurAdjuster extends Adjuster<GPUImageGaussianBlurFilter> {
+            @Override
+            public void adjust(final int percentage) {
+                getFilter().setBlurSize(range(percentage, 0.0f, 1.0f));
+            }
+        }
+
+        private class SelectiveGaussianBlurAdjuster extends Adjuster<SelectiveGausianFilter> {
             @Override
             public void adjust(final int percentage) {
                 getFilter().setBlurSize(range(percentage, 0.0f, 1.0f));

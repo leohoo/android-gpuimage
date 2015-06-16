@@ -26,10 +26,6 @@ import android.hardware.Camera.Size;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
 
-import jp.co.cyberagent.android.gpuimage.util.TextureRotationUtil;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -37,6 +33,11 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.LinkedList;
 import java.util.Queue;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+
+import jp.co.cyberagent.android.gpuimage.util.TextureRotationUtil;
 
 import static jp.co.cyberagent.android.gpuimage.util.TextureRotationUtil.TEXTURE_NO_ROTATION;
 
@@ -182,6 +183,8 @@ public class GPUImageRenderer implements Renderer, PreviewCallback {
                     oldFilter.destroy();
                 }
                 mFilter.init();
+                mFilter.setSecondTextureInput(mGLTextureId);
+
                 GLES20.glUseProgram(mFilter.getProgram());
                 mFilter.onOutputSizeChanged(mOutputWidth, mOutputHeight);
             }

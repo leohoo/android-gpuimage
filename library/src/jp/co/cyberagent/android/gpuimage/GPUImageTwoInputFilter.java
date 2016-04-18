@@ -128,4 +128,8 @@ public class GPUImageTwoInputFilter extends GPUImageFilter {
 
         mTexture2CoordinatesBuffer = bBuffer;
     }
+
+    public void setSecondTextureInput(int textureId) {
+        mFilterSourceTexture2 = textureId;
+    }
 }
